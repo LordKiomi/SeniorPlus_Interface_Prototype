@@ -32,7 +32,7 @@
             overflow: hidden; position: relative; display: flex; flex-direction: column;
         }
 
-        /* EKRAN LOGOWANIA (AUTOMATYCZNY) */
+        /* EKRAN LOGOWANIA */
         #login-view { 
             position: absolute; inset: 0; background: white; z-index: 5000; 
             display: flex; flex-direction: column; justify-content: center; padding: 40px; 
@@ -43,6 +43,7 @@
         .user-profile {
             padding: 60px 25px 25px; background: white; border-bottom-left-radius: 35px; border-bottom-right-radius: 35px;
             display: flex; align-items: center; gap: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            position: relative; z-index: 10;
         }
         .user-avatar {
             width: 65px; height: 65px; border-radius: 22px; border: 3px solid var(--p);
@@ -50,30 +51,42 @@
         }
 
         /* STRUKTURA APKI */
-        #app-core { display: none; flex-direction: column; height: 100%; opacity: 0; transition: 0.5s; }
-        .main-content { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; }
+        #app-core { display: none; flex-direction: column; height: 100%; opacity: 0; transition: 0.5s; position: relative; }
+        
+        .main-content { 
+            flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; 
+            scrollbar-width: none;
+        }
+        .main-content::-webkit-scrollbar { display: none; }
         
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.4s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* WIDGETY */
-        .card { background: white; border-radius: 28px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); }
+        .card { background: white; border-radius: 28px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.03); transition: 0.3s; }
         .alert-card { background: #fff5f5; border: 2px solid #fed7d7; color: var(--d); }
 
+        /* MODUŁ KAMERY PRO */
         .cam-box { 
             width: 100%; height: 220px; border-radius: 30px; background: #000; position: relative; overflow: hidden; 
-            margin-top: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            margin-top: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.2); border: 2px solid #222;
         }
+        .live-indicator {
+            display: inline-block; width: 6px; height: 6px; background: var(--d);
+            border-radius: 50%; margin-right: 6px; animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.3;} 100% {opacity: 1;} }
 
         /* PASEK NAWIGACJI (DOCK) */
         .dock {
             position: absolute; bottom: 25px; left: 20px; right: 20px; height: 85px;
-            background: #1a1a1a; backdrop-filter: blur(10px); border-radius: 30px;
+            background: rgba(26, 26, 26, 0.85); backdrop-filter: blur(15px); border-radius: 30px;
             display: flex; justify-content: space-around; align-items: center; z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
-        .nav-link { color: #555; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.3s; }
-        .nav-link.active { color: var(--p); transform: translateY(-5px); }
+        .nav-link { color: #888; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-link.active { color: var(--p); transform: translateY(-5px) scale(1.05); }
         .nav-link svg { width: 22px; height: 22px; }
         .nav-link span { font-size: 9px; font-weight: 800; text-transform: uppercase; }
 
@@ -81,8 +94,51 @@
         .progress-bg { height: 10px; background: #eee; border-radius: 5px; margin: 10px 0; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--p); border-radius: 5px; transition: 1s; }
 
-        /* PRZYCISK SOS */
-        .sos-btn { background: var(--d); color: white; padding: 15px; border-radius: 20px; border: none; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; cursor: pointer; }
+        /* PRZYCISKI */
+        .btn-outline { width:100%; padding:15px; border-radius:15px; border:2px dashed #cbd5e1; background:transparent; font-weight:700; color:#64748b; cursor:pointer; transition:0.2s; }
+        .btn-outline:active { background: #f1f5f9; }
+        .btn-solid { width:100%; padding:18px; border-radius:15px; background:var(--s); color:white; border:none; font-weight:800; cursor:pointer; box-shadow: 0 10px 20px rgba(74, 105, 189, 0.2); transition: 0.2s; }
+        .btn-solid:active { transform: scale(0.98); }
+        
+        .sos-btn { 
+            background: var(--d); color: white; padding: 15px; border-radius: 20px; border: none; 
+            font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 10px; 
+            width: 100%; cursor: pointer; animation: pulse-sos 2s infinite;
+        }
+        @keyframes pulse-sos { 0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.5); } 70% { box-shadow: 0 0 0 15px rgba(255, 71, 87, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); } }
+
+        /* MODALE (POP-UPY) */
+        .modal-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            z-index: 10001; display: none; justify-content: center; align-items: flex-end;
+            padding: 20px; opacity: 0; transition: 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-box {
+            background: white; width: 100%; border-radius: 35px; padding: 30px;
+            transform: translateY(100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 20px; box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        
+        /* FORMULARZE W MODALU */
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; font-weight: 700; color: var(--mut); margin-bottom: 5px; }
+        .input-group input { 
+            width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #e2e8f0; 
+            font-size: 14px; font-weight: 600; outline: none; transition: 0.2s; 
+        }
+        .input-group input:focus { border-color: var(--p); }
+
+        /* TOAST NOTIFICATION */
+        .toast {
+            position: absolute; top: 110px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #1e293b; color: white; padding: 12px 25px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; opacity: 0; transition: 0.4s; z-index: 10005;
+            display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
@@ -91,15 +147,55 @@
         <div class="island"></div>
         <div class="screen">
 
+            <div id="toast-msg" class="toast">
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--p)" stroke-width="3" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span id="toast-text">Akcja zakończona sukcesem</span>
+            </div>
+
+            <div id="modal-add-med" class="modal-overlay" onclick="closeModal(event, 'modal-add-med')">
+                <div class="modal-box" onclick="event.stopPropagation()">
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 20px;">Dodaj nowy lek</h3>
+                    <div class="input-group">
+                        <label>Godzina podania</label>
+                        <input type="time" id="med-time" value="15:00">
+                    </div>
+                    <div class="input-group">
+                        <label>Nazwa leku / Opis</label>
+                        <input type="text" id="med-name" placeholder="np. Witamina D3 + Magnez">
+                    </div>
+                    <button onclick="saveNewMed()" class="btn-solid" style="background: var(--p); margin-top: 10px;">ZAPISZ DO PLANU</button>
+                    <button onclick="document.getElementById('modal-add-med').classList.remove('active')" class="btn-outline" style="border:none; margin-top:5px;">Anuluj</button>
+                </div>
+            </div>
+
+            <div id="modal-shopping" class="modal-overlay" onclick="closeModal(event, 'modal-shopping')">
+                <div class="modal-box" onclick="event.stopPropagation()">
+                    <div style="width: 60px; height: 60px; background: #e1fdf9; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: var(--p); margin-bottom: 15px;">
+                        <svg viewBox="0 0 24 24" width="30" height="30" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    </div>
+                    <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 5px;">Wygenerowano listę!</h3>
+                    <p style="font-size: 13px; color: var(--mut); margin-bottom: 20px;">Lista została wysłana na Twój telefon poprzez SMS oraz e-mail.</p>
+                    
+                    <div style="background: var(--bg); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                        <ul style="list-style: none; font-size: 14px; font-weight: 700; color: var(--txt); display:flex; flex-direction: column; gap: 10px;">
+                            <li style="display: flex; justify-content: space-between;">Lek na ciśnienie <span style="color:var(--d)">PILNE (2 dni)</span></li>
+                            <li style="display: flex; justify-content: space-between;">Lek osłonowy <span style="color:var(--w)">Końcówka (5 dni)</span></li>
+                        </ul>
+                    </div>
+
+                    <button onclick="document.getElementById('modal-shopping').classList.remove('active')" class="btn-solid">ZAMKNIJ OKNO</button>
+                </div>
+            </div>
+
             <div id="login-view">
                 <div style="text-align: center; margin-bottom: 40px;">
-                    <div style="width: 90px; height: 90px; background: var(--p); border-radius: 28px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white;">
+                    <div style="width: 90px; height: 90px; background: var(--p); border-radius: 28px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 15px 25px rgba(0, 209, 178, 0.3);">
                         <svg viewBox="0 0 24 24" width="45" height="45" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                     </div>
                     <h1 style="font-size: 32px; font-weight: 800; color: #1e293b;">Senior<span style="color:var(--p)">+</span></h1>
                     <p style="color: var(--mut); font-weight: 600;">Panel Opiekuna Medycznego</p>
                 </div>
-                <button onclick="loginNow()" style="width: 100%; padding: 22px; border-radius: 22px; border: none; background: var(--p); color: white; font-weight: 800; font-size: 18px; cursor: pointer;">WEJDŹ DO PANELU</button>
+                <button onclick="loginNow()" style="width: 100%; padding: 22px; border-radius: 22px; border: none; background: var(--p); color: white; font-weight: 800; font-size: 18px; cursor: pointer; box-shadow: 0 10px 20px rgba(0, 209, 178, 0.2);">WEJDŹ DO PANELU</button>
             </div>
 
             <div id="app-core">
@@ -109,8 +205,8 @@
                         <h2 style="font-size: 18px; font-weight: 800;">Janina Kowalska</h2>
                         <span style="font-size: 12px; color: var(--p); font-weight: 700;">● Urządzenie Online</span>
                     </div>
-                    <div style="margin-left: auto; background: #e1fdf9; padding: 8px; border-radius: 12px; color: var(--p);">
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                    <div style="margin-left: auto; background: #e1fdf9; padding: 10px; border-radius: 14px; color: var(--p);">
+                        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
                     </div>
                 </div>
 
@@ -148,29 +244,40 @@
                             </div>
                         </div>
 
-                        <h3 style="font-size: 16px; font-weight: 800; margin: 20px 0 10px;">Podgląd Salon Seniora</h3>
+                        <h3 style="font-size: 16px; font-weight: 800; margin: 20px 0 10px;">Podgląd z Dyspensera</h3>
                         <div class="cam-box">
-                            <div style="position:absolute; top:15px; left:15px; background:var(--d); color:white; padding:4px 10px; border-radius:8px; font-size:10px; font-weight:800; z-index:10;">LIVE</div>
-                            <img src="https://images.unsplash.com/photo-1516733958034-442479f6764d?q=80&w=400" style="width:100%; height:100%; object-fit:cover; opacity:0.7;">
+                            <div style="position:absolute; top:12px; left:12px; background:rgba(0,0,0,0.6); color:white; padding:5px 12px; border-radius:12px; font-size:10px; font-weight:800; z-index:10; backdrop-filter: blur(4px); display: flex; align-items: center;">
+                                <span class="live-indicator"></span> LIVE
+                            </div>
+                            <div id="cam-timestamp" style="position:absolute; bottom:12px; right:15px; color:rgba(255,255,255,0.9); font-size:11px; font-weight:600; z-index:10; font-family: monospace; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"></div>
+
+                            <video autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; opacity:0.9; filter: contrast(1.15) saturate(0.85) brightness(0.95);">
+                                <source src="tabletkomat.mp4" type="video/mp4">
+                                Twoja przeglądarka nie obsługuje tagu wideo.
+                            </video>
                         </div>
                     </div>
 
                     <div id="tab-plan" class="view-section">
                         <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 15px;">Plan podawania</h3>
-                        <div class="card">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div><b>08:00 - Dawka Poranna</b><p style="font-size:12px; color:var(--mut);">Lek A + Witaminy</p></div>
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--p)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        
+                        <div id="plan-list">
+                            <div class="card">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div><b>08:00 - Dawka Poranna</b><p style="font-size:12px; color:var(--mut);">Lek A + Witaminy</p></div>
+                                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--p)" stroke-width="2.5" fill="none"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <div><b>12:00 - Południe</b><p style="font-size:12px; color:var(--mut);">Lek na serce</p></div>
+                                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--d)" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                </div>
                             </div>
                         </div>
-                        <div class="card">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div><b>12:00 - Południe</b><p style="font-size:12px; color:var(--mut);">Lek na serce</p></div>
-                                <svg viewBox="0 0 24 24" width="22" height="22" stroke="var(--d)" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                            </div>
-                        </div>
-                        <button style="width:100%; padding:15px; border-radius:15px; border:2px dashed #ccc; background:transparent; font-weight:700; color:#888;">+ Dodaj nowy lek</button>
-                        <button style="width:100%; padding:18px; border-radius:15px; background:var(--s); color:white; border:none; font-weight:800; margin-top:15px;">WYŚLIJ DO TABLETKOMATU</button>
+
+                        <button onclick="document.getElementById('modal-add-med').classList.add('active')" class="btn-outline">+ Dodaj nowy lek</button>
+                        <button onclick="showToast('Zaktualizowano tabletkomat!')" class="btn-solid" style="margin-top:15px;">WYŚLIJ DO TABLETKOMATU</button>
                     </div>
 
                     <div id="tab-leki" class="view-section">
@@ -184,22 +291,22 @@
                             <div class="progress-bg"><div class="progress-fill" style="width: 15%; background: var(--d);"></div></div>
                             <b style="font-size: 11px; color: var(--d);">UWAGA: Zostały tylko 2 dni!</b>
                         </div>
-                        <button style="width: 100%; padding: 18px; border-radius: 18px; background: white; border: 2px solid var(--p); color: var(--p); font-weight: 800;">GENERUJ LISTĘ ZAKUPÓW</button>
+                        <button onclick="generateShoppingList()" style="width: 100%; padding: 18px; border-radius: 18px; background: white; border: 2px solid var(--p); color: var(--p); font-weight: 800; cursor:pointer; transition: 0.2s;">GENERUJ LISTĘ ZAKUPÓW</button>
                     </div>
 
                     <div id="tab-opcje" class="view-section">
                         <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">Centrum Alarmowe</h3>
-                        <button class="sos-btn">
+                        <button class="sos-btn" onclick="showToast('Służby ratunkowe zostały powiadomione!', 'var(--d)')">
                             <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"></path></svg>
                             WEZWIJ POMOC (SOS)
                         </button>
                         <h4 style="margin: 25px 0 10px;">Logi zdarzeń:</h4>
-                        <div class="card" style="font-size:12px; line-height:1.6;">
-                            <p>● 12:05 - Alert: Brak reakcji seniora</p>
-                            <p>● 08:05 - Lek poranny przyjęty</p>
-                            <p>● 07:50 - Przypomnienie wysłane</p>
+                        <div class="card" style="font-size:13px; line-height:1.8; color: var(--txt);">
+                            <p><strong>12:05</strong> - <span style="color:var(--d)">Alert: Brak reakcji seniora</span></p>
+                            <p><strong>08:05</strong> - <span style="color:var(--p)">Lek poranny przyjęty</span></p>
+                            <p><strong>07:50</strong> - Przypomnienie wysłane (SMS)</p>
                         </div>
-                        <div onclick="location.reload()" style="color: var(--d); text-align: center; font-weight: 800; cursor: pointer; padding: 20px;">Wyloguj się</div>
+                        <div onclick="location.reload()" style="color: var(--d); text-align: center; font-weight: 800; cursor: pointer; padding: 20px; margin-top: 10px;">Wyloguj się z systemu</div>
                     </div>
 
                 </div>
@@ -215,6 +322,7 @@
     </div>
 
     <script>
+        // Logowanie
         function loginNow() {
             document.getElementById('login-view').style.transform = "translateY(-100%)";
             setTimeout(() => {
@@ -223,6 +331,7 @@
             }, 600);
         }
 
+        // Zmiana zakładek
         function showTab(tabId, el) {
             document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -230,13 +339,80 @@
             el.classList.add('active');
         }
 
+        // Wykres z biblioteki Chart.js
         function initChart() {
             const ctx = document.getElementById('dashChart').getContext('2d');
             new Chart(ctx, {
                 type: 'doughnut',
                 data: { datasets: [{ data: [75, 25], backgroundColor: ['#00d1b2', '#eee'], borderWidth: 0 }] },
-                options: { cutout: '75%', plugins: { legend: { display: false } } }
+                options: { cutout: '75%', plugins: { legend: { display: false } }, animation: { duration: 1500, easing: 'easeOutQuart' } }
             });
+        }
+
+        // Zegar kamery wideo
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = now.toISOString().replace('T', ' ').substring(0, 19);
+            const camTimeEl = document.getElementById('cam-timestamp');
+            if(camTimeEl) camTimeEl.innerText = timeStr;
+        }, 1000);
+
+        // Zamykanie modali po kliknięciu w tło
+        function closeModal(event, modalId) {
+            if (event.target.id === modalId) {
+                document.getElementById(modalId).classList.remove('active');
+            }
+        }
+
+        // System powiadomień TOAST
+        function showToast(message, color = "var(--p)") {
+            const toast = document.getElementById('toast-msg');
+            const text = document.getElementById('toast-text');
+            const icon = toast.querySelector('svg');
+            
+            text.innerText = message;
+            icon.setAttribute('stroke', color);
+            
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        // LOGIKA: Dodawanie nowego leku do planu
+        function saveNewMed() {
+            const timeVal = document.getElementById('med-time').value;
+            const nameVal = document.getElementById('med-name').value;
+
+            if(!nameVal.trim()) {
+                alert("Wpisz nazwę leku!");
+                return;
+            }
+
+            const planList = document.getElementById('plan-list');
+            const newCard = document.createElement('div');
+            newCard.className = 'card';
+            newCard.style.animation = "fadeIn 0.4s ease";
+            
+            newCard.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div><b>${timeVal} - Dodatkowa dawka</b><p style="font-size:12px; color:var(--mut);">${nameVal}</p></div>
+                    <svg viewBox="0 0 24 24" width="22" height="22" stroke="#ccc" stroke-width="2.5" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+            `;
+            
+            planList.appendChild(newCard);
+            
+            // Wyczyść inputy i zamknij okno
+            document.getElementById('med-name').value = '';
+            document.getElementById('modal-add-med').classList.remove('active');
+            
+            showToast("Lek został dodany do planu!");
+        }
+
+        // LOGIKA: Generowanie listy zakupów
+        function generateShoppingList() {
+            // Pokazujemy wyprofilowany modal informujący o wysłaniu listy
+            document.getElementById('modal-shopping').classList.add('active');
+            showToast("Lista wygenerowana poprawnie!");
         }
     </script>
 </body>
